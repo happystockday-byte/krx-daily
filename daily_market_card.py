@@ -137,7 +137,7 @@ def render(d: dict, path: str) -> str:
     table(60, 915, "외국인 순매수 TOP 5", d["foreign_buy"], UP)
     table(550, 915, "외국인 순매도 TOP 5", d["foreign_sell"], DOWN)
 
-    g.text((60, H - 70), f"단위: 억 원 · 집계: {MKT_LABEL[CFG["MARKET"]]} · 자료: 한국거래소 · 정보 제공 목적",
+    g.text((60, H - 70), f"단위: 억 원 · 집계: {MKT_LABEL[CFG['MARKET']]} · 자료: 한국거래소 · 정보 제공 목적",
            font=F(22), fill=SUB)
 
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
@@ -154,12 +154,14 @@ def post_to_x(image_path: str, text: str) -> str:
     with open(image_path, "rb") as f:
         r = s.post("https://api.x.com/2/media/upload",
                    files={"media": f}, data={"media_category": "tweet_image"})
-    r.raise_for_status()
+    if not r.ok:
+        raise RuntimeError(f"미디어 업로드 실패 {r.status_code}: {r.text}")
     media_id = r.json()["data"]["id"]
 
     r = s.post("https://api.x.com/2/tweets",
                json={"text": text, "media": {"media_ids": [media_id]}})
-    r.raise_for_status()
+    if not r.ok:
+        raise RuntimeError(f"포스트 생성 실패 {r.status_code}: {r.text}")
     return r.json()["data"]["id"]
 
 
