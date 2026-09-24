@@ -1,0 +1,6 @@
+pykrx
+pandas
+pillow
+requests
+requests-oauthlib
+python-dotenv
