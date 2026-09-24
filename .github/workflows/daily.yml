@@ -1,0 +1,35 @@
+name: KRX Daily Card to X
+
+on:
+  schedule:
+    - cron: "0 8 * * 1-5"   # UTC 08:00 = 한국시간 17:00, 월~금
+  workflow_dispatch:         # Actions 탭에서 수동 실행 버튼
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    env:
+      TZ: Asia/Seoul
+      FONT_REG: /usr/share/fonts/truetype/nanum/NanumGothic.ttf
+      FONT_BOLD: /usr/share/fonts/truetype/nanum/NanumGothicBold.ttf
+      X_API_KEY: ${{ secrets.X_API_KEY }}
+      X_API_SECRET: ${{ secrets.X_API_SECRET }}
+      X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+      X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Korean font
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq fonts-nanum
+      - name: Install packages
+        run: pip install -r requirements.txt
+      - name: Run
+        run: python daily_market_card.py
+      - name: Save card image
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: card
+          path: output/
