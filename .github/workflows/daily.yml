@@ -23,6 +23,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Check secrets
+        run: |
+          for v in KRX_ID KRX_PW X_API_KEY X_API_SECRET X_ACCESS_TOKEN X_ACCESS_SECRET; do
+            if [ -z "${!v}" ]; then echo "❌ $v 비어있음"; else echo "✅ $v 설정됨"; fi
+          done
       - name: Install Korean font
         run: sudo apt-get update -qq && sudo apt-get install -y -qq fonts-nanum
       - name: Install packages
